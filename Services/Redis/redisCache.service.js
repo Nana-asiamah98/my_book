@@ -8,19 +8,19 @@ dotenv.config({
     path: '/.env'
 });
 
+const TOKEN = process.env.TOKEN || 'token';
 
 const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 const client = redis.createClient(REDIS_PORT);
 
 function cache(req,res,next){
-    const {username} = req.params;
-
-    client.get(username,(err,data) => {
+    client.get(TOKEN,(err,data) => {
         if(err) throw err;
 
+        
         if(data != null){
-            res.send(setResponse(username,data))
+            res.send(JSON.parse(data))
         }else{
             next();
         }

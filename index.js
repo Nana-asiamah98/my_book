@@ -1,22 +1,27 @@
 const express = require('express');
-const redis = require('redis');
-const fetch = require('node-fetch');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
 
 const MainRouter = require('./Routes/main.route')
 
 dotenv.config({
-    path: '/.env'
+    path: './.env'
 });
 
 // Environment Variables Path
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
+const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
 
+app.use(bodyParser.json())
+
 app.use('/api',MainRouter);
 
-
-app.listen(PORT, () => {
-    console.log(`Running on PORT ${PORT}`);
-});
+mongoose.connect(MONGO_URI,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => app.listen(PORT,() => {
+    console.log(`Server is running on Port ${PORT}`)
+})).catch((error) => console.log(`${error} did not connect`));
