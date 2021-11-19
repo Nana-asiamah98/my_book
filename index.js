@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 
 const MainRouter = require('./Routes/main.route')
+const AuthRouter = require('./Routes/auth.route')
+const UserRouter = require('./Routes/user.route')
 
 dotenv.config({
     path: './.env'
@@ -18,6 +20,8 @@ const app = express();
 app.use(bodyParser.json())
 
 app.use('/api',MainRouter);
+app.use('/api',AuthRouter);
+app.use('/api',UserRouter);
 
 mongoose.connect(MONGO_URI,{
     useNewUrlParser: true,
