@@ -32,6 +32,10 @@ mongoose.connect(MONGO_URI,{
 .catch((error) => console.log(`${error} did not connect`));
 
 
+console.log(`MONGO : ${MONGO_URI}`)
+
+app.set(`port`,PORT);
+
 app.listen(()=>{
     console.log('APP started');
 })
