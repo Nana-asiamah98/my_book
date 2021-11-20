@@ -36,6 +36,18 @@ class BookService{
         }
     }
 
+    async findBookByUserId(id){
+        try {
+            const result = await this.MongooseService.find({"user_id": id});
+            return {
+                success: true,
+                body: result
+            }
+        } catch (error) {
+            
+        }
+    }
+
 
     async findBook(book_id){
         try{

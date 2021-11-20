@@ -1,12 +1,17 @@
 const express = require('express');
 // const redis = require('redis');
+const jwt = require('jsonwebtoken')
+
 const dotenv = require('dotenv');
 
 dotenv.config({
-    path: '/.env'
+    path: './.env'
 });
 
 // const REDIS_PORT = process.env.REDIS_PORT || 6379;
+
+const JWT_SECRET = process.env.SECRET
+
 
 const TOKEN = process.env.TOKEN || 'token';
 
@@ -21,16 +26,37 @@ const BookService = require('../../Services/Book/book.service');
 // Instances
 const BookServiceInstance = new BookService();
 
+
 // Create Book Controller
 async function createBook(req,res) {
     try{
-        const bookData = await BookServiceInstance.createBook(req.body);
+        const {id} = decodeJWT(req);
+        const bookModel = {
+            'title' : req.body.title,
+            'description' : req.body.description,
+            'user_id' : id
+        };
+        const bookData = await BookServiceInstance.createBook(bookModel);
+        
         //Set data to redis
         
         return res.send(bookData);
 
     } catch(err){
         return res.status(500).send(err);
+    }
+}
+
+// Fetch Based On User Id
+async function fetchPerUser(req,res){
+    try {
+        const {id} = decodeJWT(req);
+        const bookData = await BookServiceInstance.findBookByUserId(id);
+
+        return res.send(bookData);
+    } catch (error) {
+        return res.status(200).send(error);
+
     }
 }
 
@@ -81,4 +107,15 @@ async function deleteBook(req,res) {
     }
 }
 
-module.exports = {createBook,findBook,findBooks,updateBook,deleteBook};
+
+
+// JWT DECODE
+function decodeJWT(req){
+    const token = req.headers.authorization.split(" ")[1];
+    
+    payload = jwt.verify(token, JWT_SECRET);
+    return payload;
+}
+
+
+module.exports = {createBook,findBook,findBooks,updateBook,deleteBook, fetchPerUser};

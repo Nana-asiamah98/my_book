@@ -11,6 +11,7 @@ const requireAuth = async (req, res, next) => {
         const token = req.headers.authorization.split(" ")[1];
         const isCustomAuth = token.length < 500;
         const JWT_SECRET = process.env.SECRET
+
     
         let decodedData;
     
@@ -29,5 +30,7 @@ const requireAuth = async (req, res, next) => {
         console.log(error);
       }
 }
+
+
 
 module.exports = {requireAuth}

@@ -50,7 +50,6 @@ async function registerUserService(userdetails){
 
     //Hashing the passwords
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword)
 
     json({
         status:'ok'
@@ -59,7 +58,6 @@ async function registerUserService(userdetails){
 
 //User login
 async function loginUserService(userDetails){
-    console.log(userDetails);
 
     
     const {username, password} = userDetails;

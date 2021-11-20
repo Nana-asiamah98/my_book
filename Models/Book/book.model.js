@@ -10,6 +10,11 @@ const BookSchema = new mongoose.Schema({
         type: String,
         required: false,
         unique: false
+    },
+    user_id: {
+        type: String,
+        required: true,
+        unique: false,
     }
 },
     {collection: 'books'}
