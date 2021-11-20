@@ -12,7 +12,7 @@ dotenv.config({
 });
 
 // Environment Variables Path
-const PORT = 5000;
+const PORT = process.env.PORT;
 const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
