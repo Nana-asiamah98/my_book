@@ -1,66 +1,31 @@
 const express = require('express');
-const redis = require('redis');
-const fetch = require('node-fetch');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
 
-const PORT = process.env.PORT || 5000;
-const REDIS_PORT = process.env.PORT || 6379;
+const MainRouter = require('./Routes/main.route')
+const AuthRouter = require('./Routes/auth.route')
+const UserRouter = require('./Routes/user.route')
 
-const client = redis.createClient(REDIS_PORT);
+dotenv.config({
+    path: './.env'
+});
+
+// Environment Variables Path
+const PORT = 5000;
+const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
 
+app.use(bodyParser.json())
 
-function setResponse(username, repos){
-        return `<h1>${username} has ${repos} on Github repos.</h1>`
-}
+app.use('/api',MainRouter);
+app.use('/api',AuthRouter);
+app.use('/api',UserRouter);
 
-
-// Make requiest to github for data
-async function getRepos(req, res,next){
-try {
-
-
-    const {username} = req.params;
-
-    const response = await fetch(`https://api.github.com/users/${username}`);
-
-    const data = await response.json();
-
-    res.send(data);
-
-    const repos = data.public_repos;
-
-    //Set data to redis
-    client.setex(username, 3600, repos);
-
-    console.log(setResponse(username, repos));
-
-
-} catch (error) {
-    console.log(error);
-    res.status(500);
-}
-
-}
-
-
-// Cache Middleware
-function cache(req,res,next){
-    const {username} = req.params;
-
-    client.get(username, (err,data) => {
-        if(err) throw err;
-
-        if(data != null) {
-            res.send(setResponse(username,data))
-        }else{
-            next();
-        }
-    })
-}
-
-app.get('/repos/:username',cache, getRepos);
-
-app.listen(PORT, () => {
-    console.log(`Running on PORT ${PORT}`);
-});
+mongoose.connect(MONGO_URI,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => app.listen(PORT,() => {
+    console.log(`Server is running on Port ${PORT}`)
+})).catch((error) => console.log(`${error} did not connect`));
